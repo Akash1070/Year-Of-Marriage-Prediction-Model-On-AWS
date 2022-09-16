@@ -18,31 +18,82 @@ To install the libraries used in this project. Follow the
 below steps:
 
 ```bash
-!pip install cufflinks
-!pip install chart_studio
-!pip install pandas-profiling
-
-from chart_studio.plotly import plot,iplot
-from sklearn.ensemble import ExtraTreesRegressor
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import  ExtraTreesRegressor
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.model_selection import RandomizedSearchCV
-from sklearn.metrics import mean_absolute_error,mean_squared_error
-from catboost import CatBoostRegressor
-from lightgbm import LGBMRegressor
-
-
-import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import xgboost as xgb
-import cufflinks as cf
-import seaborn as sns
-import pickle 
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_absolute_error, r2_score
+import pickle
 
+```
 
-%matplotlib inline
+## Deployment
+
+To Deploy the libraries used in this project. Follow the 
+below Codes:
+
+Type the command ssh -i aws-key.pem ubuntu@(add your Private Private
+IPv4 addresses) 
+
+Type chmod 400 aws-key.pem to get rid of the error
+
+Check to see if you have Python 3 installed: python3 -V
+Let’s update all the existing packages: sudo apt-get update
+
+Check if pip is installed, else install it. pip
+If pip is not installed, download pip: curl -O https://bootstrap.pypa.io/get-pip.py
+Update
+
+Install pip: sudo python3 get-pip.py
+Install Flask: sudo pip install flask
+
+Install the following as well
+sudo pip install flask_cors
+ sudo apt-get install apache2
+ sudo pip install sklearn
+ sudo apt-get install libapache2-mod-wsgi-py3
+
+Let’s do some configurations: sudo vi /etc/apache2/sites-enabled/000-default.conf
+Copy and paste the following codes:
+DocumentRoot /home/ubuntu/mlapp
+WSGIDaemonProcess flaskapp threads=5 python-home=/usr/local/lib/python3.5/site-packages/ user=ubuntu
+ WSGIScriptAlias / /home/ubuntu/mlapp/flaskapp.wsgi
+<Directory /home/ubuntu/mlapp>
+ WSGIProcessGroup flaskapp
+ WSGIApplicationGroup %{GLOBAL}
+ Require all granted
+ </Directory>
+ 
+ Now press escape(esc) followed by :wq! then press enter to exit
+ 
+ Create file flaskapp.wsgi at mlapp directory
+ The Web Server Gateway(wsgi) Interface is a simple calling convention for web servers to forward
+requests to web applications
+Steps:
+irst create a directory: mkdir mlapp
+cd to the directory: cd mlapp/
+vi flaskapp.wsgi
+
+import sys
+import site
+site.addsitedir(‘/home/ubuntu/.local/lib/python3.5/site-packages’)
+sys.path.insert(0, ‘/home/ubuntu/mlapp’)
+from app import app as application
+
+Make sure you have saved your model and app.py file
+Move your files to AWS
+NB: do this from a new Terminal or Command Prompt 
+
+cd to the deployment folder
+Then type: scp -i (path to was key) -r app.py ubuntu@(add your public key here):/home/ubuntu/mlapp
+
+Confirm to see if you have all files: ls
+Restart the server: sudo apachectl restart
+Check log incase you run into any error: cat /var/log/apache2/error.log
+
+Use vi (File Name). to see the error and fix it.
+restart the server again
+Test your App by copying and pasting your public key (e.g. 157.36.87.192) into your browser
+
 ```
     
 ## Running Flask Api
